@@ -8,7 +8,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
- 
+
+    permissions:
+      contents: read
+      packages: write
+    
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -18,7 +22,21 @@ jobs:
  
       - name: Build Docker Image
         run: docker build -t myapp:${{ github.sha }} .
-      
+
+      - name: Login to GitHub Package Registry
+        uses: docker/login-action@v1.12.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64/v8
+          push: true
+          tags: ghcr.io/lomtom/spark-dependencies:1.62.0
       # - name: Push Docker Image
       #   run: |
       #     echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
