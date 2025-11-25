@@ -1,4 +1,4 @@
-FROM node:12.16.3-alpine AS builder
+FROM node:18-alpine AS builder
 
 # 将容器的工作目录设置为/app(当前目录，如果/app不存在，WORKDIR会创建/app文件夹)
 WORKDIR /app 
@@ -6,7 +6,7 @@ WORKDIR /app
 COPY ./package*.json /app/ 
 
 #安装依赖
-RUN npm config set registry "https://registry.npm.taobao.org/" \
+RUN npm config set registry "https://registry.npmmirror.com" \
   && npm install 
 COPY . /app
 RUN npm run build 
